@@ -1,37 +1,61 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-// import { authApi } from '../../api/authApi';
+import { loginUser, registerUser, getCurrentUser } from '../../api/authApi';
 
-const dummyToken = 'dummy-jwt-token-abc123';
-const dummyUser = {
-  _id: 'user1',
-  name: 'Demo User',
-  email: 'demo@sbstocks.com',
-  role: 'user',
-  virtualBalance: 100000,
-  createdAt: '2025-01-15T10:00:00.000Z',
-};
+export const register = createAsyncThunk(
+  "auth/register",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await registerUser(formData);
 
-export const register = createAsyncThunk('auth/register', async (formData, { rejectWithValue }) => {
-  try {
-    localStorage.setItem('token', dummyToken);
-    return { user: { ...dummyUser, name: formData.name, email: formData.email }, token: dummyToken };
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Registration failed');
+      const { token, user } = response?.data?.data;
+      
+      // Convert balance to virtualBalance
+      user.virtualBalance = +(user?.balance || 100000).toFixed(2);
+
+      localStorage.setItem("token", token);
+
+      return { user, token };
+
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed"
+      );
+    }
   }
-});
+);
 
-export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
-  try {
-    localStorage.setItem('token', dummyToken);
-    return { user: { ...dummyUser, email: credentials.email }, token: dummyToken };
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Login failed');
+export const login = createAsyncThunk(
+  "auth/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await loginUser(credentials);
+
+      const { token, user } = response.data.data;
+      
+      // Convert balance to virtualBalance
+      user.virtualBalance = +(user.balance || 100000).toFixed(2);
+
+      localStorage.setItem("token", token);
+
+      return { user, token };
+
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Login failed"
+      );
+    }
   }
-});
+);
 
 export const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWithValue }) => {
   try {
-    return dummyUser;
+    const response = await getCurrentUser();
+    const user = response.data.data;
+    // Convert balance to virtualBalance with proper formatting
+    return {
+      ...user,
+      virtualBalance: +(user.balance || 100000).toFixed(2)
+    };
   } catch (error) {
     localStorage.removeItem('token');
     return rejectWithValue('Session expired');

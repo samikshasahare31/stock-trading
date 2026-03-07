@@ -47,7 +47,7 @@ const PortfolioPage = () => {
     return <Loader text="Loading portfolio..." />;
   }
 
-  const isOverallPositive = summary.totalProfitLoss >= 0;
+  const isOverallPositive = summary?.totalProfitLoss >= 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -63,7 +63,7 @@ const PortfolioPage = () => {
             <p className="text-sm font-medium text-primary-100">Portfolio Value</p>
           </div>
           <p className="text-2xl font-extrabold">
-            {formatCurrency(summary.totalPortfolioValue)}
+            {formatCurrency(summary?.totalPortfolioValue)}
           </p>
         </div>
 
@@ -73,7 +73,7 @@ const PortfolioPage = () => {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Cash Balance</p>
           </div>
           <p className="text-2xl font-extrabold text-gray-900 dark:text-white">
-            {formatCurrency(summary.virtualBalance)}
+            {formatCurrency(summary?.virtualBalance)}
           </p>
         </div>
 
@@ -83,7 +83,7 @@ const PortfolioPage = () => {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Invested</p>
           </div>
           <p className="text-2xl font-extrabold text-gray-900 dark:text-white">
-            {formatCurrency(summary.totalInvested)}
+            {formatCurrency(summary?.totalInvested)}
           </p>
         </div>
 
@@ -102,8 +102,8 @@ const PortfolioPage = () => {
                 : 'text-red-600 dark:text-red-400'
               }`}
           >
-            {summary.totalProfitLoss >= 0 ? '+' : ''}
-            {formatCurrency(summary.totalProfitLoss)}
+            {summary?.totalProfitLoss >= 0 ? '+' : ''}
+            {formatCurrency(summary?.totalProfitLoss)}
           </p>
         </div>
 
@@ -113,12 +113,12 @@ const PortfolioPage = () => {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Return</p>
           </div>
           <p
-            className={`text-2xl font-extrabold ${summary.overallReturn >= 0
+            className={`text-2xl font-extrabold ${summary?.overallReturn >= 0
                 ? 'text-green-600 dark:text-green-400'
                 : 'text-red-600 dark:text-red-400'
               }`}
           >
-            {formatPercent(summary.overallReturn || 0)}
+            {formatPercent(summary?.overallReturn || 0)}
           </p>
         </div>
       </div>
@@ -144,7 +144,7 @@ const PortfolioPage = () => {
                     Holdings
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                    {summary.holdingsCount || holdings.length}
+                    {summary?.holdingsCount || holdings.length}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
@@ -152,7 +152,7 @@ const PortfolioPage = () => {
                     Current Value
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                    {formatCurrency(summary.totalCurrentValue)}
+                    {formatCurrency(summary?.totalCurrentValue)}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
@@ -160,7 +160,7 @@ const PortfolioPage = () => {
                     Cash
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                    {formatCurrency(summary.virtualBalance)}
+                    {formatCurrency(summary?.virtualBalance)}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
@@ -168,7 +168,7 @@ const PortfolioPage = () => {
                     Invested
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                    {formatCurrency(summary.totalInvested)}
+                    {formatCurrency(summary?.totalInvested)}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
@@ -176,13 +176,13 @@ const PortfolioPage = () => {
                     Unrealized P&L
                   </p>
                   <p
-                    className={`text-2xl font-bold mt-1 ${summary.totalProfitLoss >= 0
+                    className={`text-2xl font-bold mt-1 ${summary?.totalProfitLoss >= 0
                         ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400'
                       }`}
                   >
-                    {summary.totalProfitLoss >= 0 ? '+' : ''}
-                    {formatCurrency(summary.totalProfitLoss)}
+                    {summary?.totalProfitLoss >= 0 ? '+' : ''}
+                    {formatCurrency(summary?.totalProfitLoss)}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
@@ -190,12 +190,12 @@ const PortfolioPage = () => {
                     Return
                   </p>
                   <p
-                    className={`text-2xl font-bold mt-1 ${summary.overallReturn >= 0
+                    className={`text-2xl font-bold mt-1 ${summary?.overallReturn >= 0
                         ? 'text-green-600 dark:text-green-400'
                         : 'text-red-600 dark:text-red-400'
                       }`}
                   >
-                    {formatPercent(summary.overallReturn || 0)}
+                    {formatPercent(summary?.overallReturn || 0)}
                   </p>
                 </div>
               </div>

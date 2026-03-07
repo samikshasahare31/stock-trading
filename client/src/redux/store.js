@@ -4,6 +4,7 @@ import stockReducer from './slices/stockSlice';
 import portfolioReducer from './slices/portfolioSlice';
 import transactionReducer from './slices/transactionSlice';
 import watchlistReducer from './slices/watchlistSlice';
+import adminReducer from './slices/adminSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,7 @@ export const store = configureStore({
     portfolio: portfolioReducer,
     transactions: transactionReducer,
     watchlist: watchlistReducer,
+    admin: adminReducer,  
+
   },
 });

@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FiUsers, FiBarChart2, FiPlus, FiRefreshCw, FiTrash2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../utils/formatCurrency';
 import { formatDateTime } from '../utils/formatDate';
 import Loader from '../components/common/Loader';
+import { fetchAdminStats, fetchAdminUsers, createStock, editStock, deactivateStock, resetBalance } from '../redux/slices/adminSlice';
 
 const TABS = [
   { key: 'stats', label: 'Dashboard Stats', icon: FiBarChart2 },
@@ -69,50 +71,29 @@ const dummyUsers = [
 ];
 
 const AdminPanelPage = () => {
+  const dispatch = useDispatch();
+  // const { stats, users, loading: statsLoading, usersLoading } = useSelector(state => state.admin);
+  const { stats, users, statsLoading, usersLoading } = useSelector(state => state.admin);
+  
   const [activeTab, setActiveTab] = useState('stats');
-  const [stats, setStats] = useState(null);
-  const [statsLoading, setStatsLoading] = useState(false);
-  const [stocks, setStocks] = useState([]);
-  const [stocksLoading, setStocksLoading] = useState(false);
   const [stockForm, setStockForm] = useState(initialStockForm);
   const [stockFormLoading, setStockFormLoading] = useState(false);
   const [editingStock, setEditingStock] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [usersLoading, setUsersLoading] = useState(false);
+  const [stocks, setStocks] = useState([]);
+  const [stocksLoading, setStocksLoading] = useState(false);
   const [resettingUserId, setResettingUserId] = useState(null);
 
   const fetchStats = useCallback(async () => {
-    setStatsLoading(true);
-    try {
-      setStats(dummyStats);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to load stats');
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
+    dispatch(fetchAdminStats());
+  }, [dispatch]);
 
   const fetchStocks = useCallback(async () => {
-    setStocksLoading(true);
-    try {
-        setStocks(dummyAdminStocks);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to load stocks');
-    } finally {
-      setStocksLoading(false);
-    }
+    // TODO: Add fetchAdminStocks thunk to Redux
   }, []);
 
   const fetchUsers = useCallback(async () => {
-    setUsersLoading(true);
-    try {
-     setUsers(dummyUsers);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to load users');
-    } finally {
-      setUsersLoading(false);
-    }
-  }, []);
+    dispatch(fetchAdminUsers());
+  }, [dispatch]);
 
   useEffect(() => {
     if (activeTab === 'stats') fetchStats();
@@ -134,9 +115,11 @@ const AdminPanelPage = () => {
 
     setStockFormLoading(true);
     try {
-          if (editingStock) {
+      if (editingStock) {
+        await dispatch(editStock({ stockId: editingStock._id, stockData: stockForm })).unwrap();
         toast.success('Stock updated successfully');
       } else {
+        await dispatch(createStock(stockForm)).unwrap();
         toast.success('Stock added successfully');
       }
 
@@ -144,7 +127,7 @@ const AdminPanelPage = () => {
       setEditingStock(null);
       fetchStocks();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to save stock');
+      toast.error(err || 'Failed to save stock');
     } finally {
       setStockFormLoading(false);
     }
@@ -165,6 +148,7 @@ const AdminPanelPage = () => {
   const handleDeactivateStock = async (stockId) => {
     if (!window.confirm('Are you sure you want to deactivate this stock?')) return;
     try {
+      await dispatch(deactivateStock(stockId)).unwrap();
       toast.success('Stock deactivated');
       fetchStocks();
     } catch (err) {
@@ -174,12 +158,13 @@ const AdminPanelPage = () => {
 
   const handleResetBalance = async (userId) => {
     if (!window.confirm('Reset this user\'s balance to ₹100,000?')) return;
+    try{
     setResettingUserId(userId);
-    try {
-    
+      await dispatch(resetBalance(userId)).unwrap();
       toast.success('Balance reset successfully');
       fetchUsers();
     } catch (err) {
+      // toast.error(err
       toast.error(err.response?.data?.message || 'Failed to reset balance');
     } finally {
       setResettingUserId(null);
