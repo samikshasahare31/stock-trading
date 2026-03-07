@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-// import { authApi } from '../../api/authApi';
+import {  loginUser, registerUser } from '../../api/authApi';
 
 const dummyToken = 'dummy-jwt-token-abc123';
 const dummyUser = {
@@ -11,23 +11,45 @@ const dummyUser = {
   createdAt: '2025-01-15T10:00:00.000Z',
 };
 
-export const register = createAsyncThunk('auth/register', async (formData, { rejectWithValue }) => {
-  try {
-    localStorage.setItem('token', dummyToken);
-    return { user: { ...dummyUser, name: formData.name, email: formData.email }, token: dummyToken };
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Registration failed');
-  }
-});
+export const register = createAsyncThunk(
+  "auth/register",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await registerUser(formData);
 
-export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
-  try {
-    localStorage.setItem('token', dummyToken);
-    return { user: { ...dummyUser, email: credentials.email }, token: dummyToken };
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Login failed');
+      const { token, user } = response.data;
+
+      localStorage.setItem("token", token);
+
+      return { user, token };
+
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed"
+      );
+    }
   }
-});
+);
+
+export const login = createAsyncThunk(
+  "auth/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await loginUser(credentials);
+
+      const { token, user } = response.data;
+
+      localStorage.setItem("token", token);
+
+      return { user, token };
+
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Login failed"
+      );
+    }
+  }
+);
 
 export const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWithValue }) => {
   try {
