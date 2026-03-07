@@ -21,8 +21,16 @@ const register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, balance: user.balance },
+      data: {
+        token,
+        user: { 
+          _id: user._id, 
+          name: user.name, 
+          email: user.email, 
+          role: user.role, 
+          balance: user.balance 
+        },
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -44,8 +52,16 @@ const login = async (req, res) => {
 
     res.json({
       success: true,
-      token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, balance: user.balance },
+      data: {
+        token,
+        user: { 
+          _id: user._id, 
+          name: user.name, 
+          email: user.email, 
+          role: user.role, 
+          balance: user.balance 
+        },
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -56,13 +72,22 @@ const login = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    res.json({ success: true, user });
+    res.json({ 
+      success: true, 
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        balance: user.balance,
+        createdAt: user.createdAt
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// PUT /api/auth/update-profile
 const updateProfile = async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -77,7 +102,6 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// PUT /api/auth/change-password
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;

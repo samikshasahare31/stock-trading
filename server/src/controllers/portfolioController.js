@@ -4,10 +4,15 @@ const Stock = require('../models/Stock');
 // GET /api/portfolio
 const getPortfolio = async (req, res) => {
   try {
-    const portfolio = await Portfolio.find({ user: req.user._id })
+    const holdings = await Portfolio.find({ user: req.user._id })
       .populate('stock', 'symbol name price change changePercent sector');
 
-    res.json({ success: true, portfolio });
+    res.json({ 
+      success: true, 
+      data: {
+        holdings
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -17,6 +22,7 @@ const getPortfolio = async (req, res) => {
 const getPortfolioSummary = async (req, res) => {
   try {
     const portfolio = await Portfolio.find({ user: req.user._id }).populate('stock');
+    const user = await require('../models/User').findById(req.user._id);
 
     let totalInvested = 0;
     let currentValue = 0;
@@ -28,14 +34,18 @@ const getPortfolioSummary = async (req, res) => {
 
     const profitLoss = currentValue - totalInvested;
     const profitLossPercent = totalInvested > 0 ? ((profitLoss / totalInvested) * 100).toFixed(2) : 0;
+    const virtualBalance = (user.balance || 100000) - totalInvested;
 
     res.json({
       success: true,
-      summary: {
+      data: {
+        virtualBalance: +virtualBalance.toFixed(2),
         totalInvested: +totalInvested.toFixed(2),
-        currentValue: +currentValue.toFixed(2),
-        profitLoss: +profitLoss.toFixed(2),
-        profitLossPercent: +profitLossPercent,
+        totalCurrentValue: +currentValue.toFixed(2),
+        totalProfitLoss: +profitLoss.toFixed(2),
+        totalPortfolioValue: +(virtualBalance + currentValue).toFixed(2),
+        overallReturn: totalInvested > 0 ? +(profitLoss / totalInvested * 100).toFixed(2) : 0,
+        holdingsCount: portfolio.length,
       },
     });
   } catch (error) {

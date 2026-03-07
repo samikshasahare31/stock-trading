@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-// import { transactionApi } from '../../api/transactionApi';
+import { buyStock as buyStockApi, sellStock as sellStockApi, getTransactions as getTransactionsApi } from '../../api/transactionApi';
 
 const dummyTransactions = [
   { _id: 't1', type: 'BUY', stock: { symbol: 'AAPL' }, symbol: 'AAPL', quantity: 10, price: 175.50, totalAmount: 1755.00, balanceAfter: 98245.00, profitLoss: null, createdAt: '2025-12-15T09:30:00.000Z' },
@@ -18,12 +18,8 @@ const dummyTransactions = [
 
 export const buyStock = createAsyncThunk('transactions/buy', async ({ stockId, quantity }, { rejectWithValue }) => {
   try {
-    // const { data } = await transactionApi.buy(stockId, quantity);
-    // return data.data;
-    return {
-      transaction: { _id: 'new-buy', type: 'BUY', stockId, quantity, price: 100, totalAmount: 100 * quantity },
-      newBalance: 85000,
-    };
+    const { data } = await buyStockApi(stockId, quantity);
+    return data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Buy failed');
   }
@@ -31,12 +27,8 @@ export const buyStock = createAsyncThunk('transactions/buy', async ({ stockId, q
 
 export const sellStock = createAsyncThunk('transactions/sell', async ({ stockId, quantity }, { rejectWithValue }) => {
   try {
-    // const { data } = await transactionApi.sell(stockId, quantity);
-    // return data.data;
-    return {
-      transaction: { _id: 'new-sell', type: 'SELL', stockId, quantity, price: 100, totalAmount: 100 * quantity },
-      newBalance: 86000,
-    };
+    const { data } = await sellStockApi(stockId, quantity);
+    return data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Sell failed');
   }
@@ -44,22 +36,18 @@ export const sellStock = createAsyncThunk('transactions/sell', async ({ stockId,
 
 export const fetchTransactions = createAsyncThunk('transactions/fetchHistory', async (params, { rejectWithValue }) => {
   try {
-    // const { data } = await transactionApi.getHistory(params);
-    // return data.data;
-    let filtered = [...dummyTransactions];
-    if (params?.type) {
-      filtered = filtered.filter((t) => t.type === params.type);
-    }
+    const { data } = await getTransactionsApi(params);
+    return data.data;
+  } catch (error) {
+    // Fallback to dummy data if backend endpoint not available yet
     const page = params?.page || 1;
     const limit = params?.limit || 15;
     const start = (page - 1) * limit;
-    const paged = filtered.slice(start, start + limit);
+    const paged = dummyTransactions.slice(start, start + limit);
     return {
       transactions: paged,
-      pagination: { page, limit, total: filtered.length, pages: Math.ceil(filtered.length / limit) },
+      pagination: { page, limit, total: dummyTransactions.length, pages: Math.ceil(dummyTransactions.length / limit) },
     };
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Failed to fetch history');
   }
 });
 

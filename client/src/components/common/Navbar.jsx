@@ -7,6 +7,7 @@ import { FiMenu, FiX, FiSun, FiMoon } from 'react-icons/fi';
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
+  const { summary } = useSelector((state) => state.portfolio);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -57,7 +58,7 @@ const Navbar = () => {
               <div className="hidden md:flex items-center gap-4">
                 <div className="text-right">
                   <p className="text-xs text-gray-500 dark:text-gray-400">Balance</p>
-                  <p className="text-sm font-bold text-primary-600">{formatCurrency(user.virtualBalance)}</p>
+                  <p className="text-sm font-bold text-primary-600">{formatCurrency(summary?.virtualBalance || user.virtualBalance)}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
@@ -84,13 +85,12 @@ const Navbar = () => {
         <div className="md:hidden bg-white dark:bg-gray-800 border-t dark:border-gray-700 px-4 py-3 space-y-2">
           {user ? (
             <>
-              <p className="text-sm font-bold text-primary-600 mb-2">Balance: {formatCurrency(user.virtualBalance)}</p>
+              <p className="text-sm font-bold text-primary-600 mb-2">Balance: {formatCurrency(summary?.virtualBalance || user.virtualBalance)}</p>
               <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block py-2 text-gray-700 dark:text-gray-300">Dashboard</Link>
               <Link to="/stocks" onClick={() => setMobileOpen(false)} className="block py-2 text-gray-700 dark:text-gray-300">Stocks</Link>
               <Link to="/portfolio" onClick={() => setMobileOpen(false)} className="block py-2 text-gray-700 dark:text-gray-300">Portfolio</Link>
               <Link to="/watchlist" onClick={() => setMobileOpen(false)} className="block py-2 text-gray-700 dark:text-gray-300">Watchlist</Link>
               <Link to="/transactions" onClick={() => setMobileOpen(false)} className="block py-2 text-gray-700 dark:text-gray-300">History</Link>
-              <Link to="/how-to-use" onClick={() => setMobileOpen(false)} className="block py-2 text-gray-700 dark:text-gray-300">How to Use</Link>
               {user.role === 'admin' && <Link to="/admin" onClick={() => setMobileOpen(false)} className="block py-2 text-gray-700 dark:text-gray-300">Admin</Link>}
               <button onClick={handleLogout} className="block py-2 text-danger-600 font-medium">Logout</button>
             </>

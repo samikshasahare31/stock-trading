@@ -1,15 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import {  loginUser, registerUser } from '../../api/authApi';
-
-const dummyToken = 'dummy-jwt-token-abc123';
-const dummyUser = {
-  _id: 'user1',
-  name: 'Demo User',
-  email: 'demo@sbstocks.com',
-  role: 'user',
-  virtualBalance: 100000,
-  createdAt: '2025-01-15T10:00:00.000Z',
-};
+import { loginUser, registerUser, getCurrentUser } from '../../api/authApi';
 
 export const register = createAsyncThunk(
   "auth/register",
@@ -17,7 +7,10 @@ export const register = createAsyncThunk(
     try {
       const response = await registerUser(formData);
 
-      const { token, user } = response.data;
+      const { token, user } = response?.data?.data;
+      
+      // Convert balance to virtualBalance
+      user.virtualBalance = +(user?.balance || 100000).toFixed(2);
 
       localStorage.setItem("token", token);
 
@@ -37,7 +30,10 @@ export const login = createAsyncThunk(
     try {
       const response = await loginUser(credentials);
 
-      const { token, user } = response.data;
+      const { token, user } = response.data.data;
+      
+      // Convert balance to virtualBalance
+      user.virtualBalance = +(user.balance || 100000).toFixed(2);
 
       localStorage.setItem("token", token);
 
@@ -53,7 +49,13 @@ export const login = createAsyncThunk(
 
 export const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWithValue }) => {
   try {
-    return dummyUser;
+    const response = await getCurrentUser();
+    const user = response.data.data;
+    // Convert balance to virtualBalance with proper formatting
+    return {
+      ...user,
+      virtualBalance: +(user.balance || 100000).toFixed(2)
+    };
   } catch (error) {
     localStorage.removeItem('token');
     return rejectWithValue('Session expired');

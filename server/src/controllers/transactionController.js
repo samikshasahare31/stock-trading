@@ -84,11 +84,26 @@ const sellStock = async (req, res) => {
 // GET /api/transactions/history
 const getHistory = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 15;
+    const skip = (page - 1) * limit;
+
     const transactions = await Transaction.find({ user: req.user._id })
       .populate('stock', 'symbol name')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json({ success: true, count: transactions.length, transactions });
+    const total = await Transaction.countDocuments({ user: req.user._id });
+    const pages = Math.ceil(total / limit);
+
+    res.json({ 
+      success: true, 
+      data: {
+        transactions, 
+        pagination: { page, limit, total, pages }
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

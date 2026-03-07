@@ -56,49 +56,43 @@ const DashboardPage = () => {
       color: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-600',
       description: 'Stocks you follow',
     },
-    {
-      label: 'How to Use',
-      to: '/how-to-use',
-      icon: <FiHelpCircle className="w-6 h-6" />,
-      color: 'bg-purple-100 dark:bg-purple-900 text-purple-600',
-      description: 'Learn paper trading',
-    },
+    
   ];
 
   const summaryCards = [
     {
       label: 'Total Portfolio Value',
-      value: formatCurrency(summary.totalPortfolioValue),
+      value: formatCurrency(summary?.totalPortfolioValue || 0),
       icon: <FaRupeeSign className="w-5 h-5" />,
       color: 'text-primary-600',
       bgColor: 'bg-primary-100 dark:bg-primary-900',
     },
     {
       label: 'Total Invested',
-      value: formatCurrency(summary.totalInvested),
+      value: formatCurrency(summary?.totalInvested || 0),
       icon: <FiPieChart className="w-5 h-5" />,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100 dark:bg-blue-900',
     },
     {
       label: 'Profit / Loss',
-      value: formatCurrency(summary.totalProfitLoss),
-      icon: summary.totalProfitLoss >= 0
+      value: formatCurrency(summary?.totalProfitLoss || 0),
+      icon: (summary?.totalProfitLoss || 0) >= 0
         ? <FiTrendingUp className="w-5 h-5" />
         : <FiTrendingDown className="w-5 h-5" />,
-      color: summary.totalProfitLoss >= 0 ? 'text-success-600' : 'text-danger-600',
-      bgColor: summary.totalProfitLoss >= 0
+      color: (summary?.totalProfitLoss || 0) >= 0 ? 'text-success-600' : 'text-danger-600',
+      bgColor: (summary?.totalProfitLoss || 0) >= 0
         ? 'bg-success-50 dark:bg-green-900'
         : 'bg-danger-50 dark:bg-red-900',
     },
     {
       label: 'Overall Return',
-      value: formatPercent(summary.overallReturn),
-      icon: summary.overallReturn >= 0
+      value: formatPercent(summary?.overallReturn || 0),
+      icon: (summary?.overallReturn || 0) >= 0
         ? <FiTrendingUp className="w-5 h-5" />
         : <FiTrendingDown className="w-5 h-5" />,
-      color: summary.overallReturn >= 0 ? 'text-success-600' : 'text-danger-600',
-      bgColor: summary.overallReturn >= 0
+      color: (summary?.overallReturn || 0) >= 0 ? 'text-success-600' : 'text-danger-600',
+      bgColor: (summary?.overallReturn || 0) >= 0
         ? 'bg-success-50 dark:bg-green-900'
         : 'bg-danger-50 dark:bg-red-900',
     },
@@ -117,7 +111,7 @@ const DashboardPage = () => {
           <div>
             <p className="text-primary-100 text-sm font-medium">Virtual Balance</p>
             <p className="text-3xl sm:text-4xl font-bold text-white mt-1">
-              {formatCurrency(user?.virtualBalance ?? summary.virtualBalance)}
+              {formatCurrency(user?.virtualBalance ?? summary?.virtualBalance ?? 0)}
             </p>
           </div>
           <div className="hidden sm:flex w-16 h-16 rounded-full bg-white/10 items-center justify-center">

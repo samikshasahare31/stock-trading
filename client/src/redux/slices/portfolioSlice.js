@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-// import { portfolioApi } from '../../api/portfolioApi';
+import { getPortfolio, getPortfolioSummary } from '../../api/portfolioApi';
 
 const dummyHoldings = [
   {
@@ -64,9 +64,8 @@ const dummySummary = calcSummary();
 
 export const fetchPortfolio = createAsyncThunk('portfolio/fetch', async (_, { rejectWithValue }) => {
   try {
-    // const { data } = await portfolioApi.getPortfolio();
-    // return data.data;
-    return { holdings: dummyHoldings };
+    const { data } = await getPortfolio();
+    return data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Failed to fetch portfolio');
   }
@@ -74,9 +73,8 @@ export const fetchPortfolio = createAsyncThunk('portfolio/fetch', async (_, { re
 
 export const fetchPortfolioSummary = createAsyncThunk('portfolio/fetchSummary', async (_, { rejectWithValue }) => {
   try {
-    // const { data } = await portfolioApi.getSummary();
-    // return data.data;
-    return dummySummary;
+    const { data } = await getPortfolioSummary();
+    return data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || 'Failed to fetch summary');
   }
