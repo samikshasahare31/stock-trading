@@ -37,16 +37,20 @@ export const sellStock = createAsyncThunk('transactions/sell', async ({ stockId,
 export const fetchTransactions = createAsyncThunk('transactions/fetchHistory', async (params, { rejectWithValue }) => {
   try {
     const { data } = await getTransactionsApi(params);
+    console.log(data);
+
     return data.data;
+    
   } catch (error) {
     // Fallback to dummy data if backend endpoint not available yet
     const page = params?.page || 1;
     const limit = params?.limit || 15;
     const start = (page - 1) * limit;
-    const paged = dummyTransactions.slice(start, start + limit);
+    // const paged = dummyTransactions.slice(start, start + limit);
+    const paged = []
     return {
       transactions: paged,
-      pagination: { page, limit, total: dummyTransactions.length, pages: Math.ceil(dummyTransactions.length / limit) },
+      pagination: { page, limit, total: 0, pages: Math.ceil(dummyTransactions.length / limit) },
     };
   }
 });
