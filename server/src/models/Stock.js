@@ -19,6 +19,13 @@ const stockSchema = new mongoose.Schema(
       required: [true, 'Stock price is required'],
       min: 0,
     },
+    currentPrice: {
+      type: Number,
+      min: 0,
+      get: function(value) {
+        return value !== undefined ? value : this.price;
+      },
+    },
     change: {
       type: Number,
       default: 0,
@@ -32,8 +39,20 @@ const stockSchema = new mongoose.Schema(
       trim: true,
       default: 'General',
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { getters: true }, toObject: { getters: true } }
 );
+
+// Set currentPrice to price if not provided
+stockSchema.pre('save', function(next) {
+  if (!this.currentPrice) {
+    this.currentPrice = this.price;
+  }
+  next();
+});
 
 module.exports = mongoose.model('Stock', stockSchema);

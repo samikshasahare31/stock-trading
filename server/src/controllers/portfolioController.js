@@ -5,7 +5,7 @@ const Stock = require('../models/Stock');
 const getPortfolio = async (req, res) => {
   try {
     const holdings = await Portfolio.find({ user: req.user._id })
-      .populate('stock', 'symbol name price change changePercent sector');
+      .populate('stock', 'symbol name price currentPrice change changePercent sector');
 
     res.json({ 
       success: true, 

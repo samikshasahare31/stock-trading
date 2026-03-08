@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
-    balance: {
+    virtualBalance: {
       type: Number,
       default: 100000, // Starting virtual balance
     },

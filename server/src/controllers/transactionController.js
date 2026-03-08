@@ -1,112 +1,73 @@
 const Transaction = require('../models/Transaction');
-const Portfolio = require('../models/Portfolio');
-const Stock = require('../models/Stock');
-const User = require('../models/User');
+const { buyStock, sellStock } = require('../services/transactionService');
+const ApiResponse = require('../utils/apiResponse');
 
 // POST /api/transactions/buy
-const buyStock = async (req, res) => {
+const buy = async (req, res, next) => {
   try {
     const { stockId, quantity } = req.body;
-    if (!stockId || !quantity || quantity < 1)
-      return res.status(400).json({ success: false, message: 'stockId and quantity (min 1) are required.' });
+    const result = await buyStock(req.user._id, stockId, quantity);
 
-    const stock = await Stock.findById(stockId);
-    if (!stock) return res.status(404).json({ success: false, message: 'Stock not found.' });
-
-    const total = stock.price * quantity;
-    const user = await User.findById(req.user._id);
-
-    if (user.balance < total)
-      return res.status(400).json({ success: false, message: 'Insufficient balance.' });
-
-    // Deduct balance
-    user.balance -= total;
-    await user.save();
-
-    // Create transaction
-    await Transaction.create({ user: user._id, stock: stockId, type: 'buy', quantity, price: stock.price, total });
-
-    // Update portfolio
-    const existing = await Portfolio.findOne({ user: user._id, stock: stockId });
-    if (existing) {
-      const newQty = existing.quantity + quantity;
-      existing.avgBuyPrice = ((existing.avgBuyPrice * existing.quantity) + total) / newQty;
-      existing.quantity = newQty;
-      await existing.save();
-    } else {
-      await Portfolio.create({ user: user._id, stock: stockId, quantity, avgBuyPrice: stock.price });
-    }
-
-    res.status(201).json({ success: true, message: `Bought ${quantity} share(s) of ${stock.symbol}.`, balance: user.balance });
+    res.status(201).json(
+      new ApiResponse(201, 'Stock purchased successfully', {
+        transaction: result.transaction,
+        holding: result.holding,
+        newBalance: result.newBalance,
+      })
+    );
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
 // POST /api/transactions/sell
-const sellStock = async (req, res) => {
+const sell = async (req, res, next) => {
   try {
     const { stockId, quantity } = req.body;
-    if (!stockId || !quantity || quantity < 1)
-      return res.status(400).json({ success: false, message: 'stockId and quantity (min 1) are required.' });
+    const result = await sellStock(req.user._id, stockId, quantity);
 
-    const stock = await Stock.findById(stockId);
-    if (!stock) return res.status(404).json({ success: false, message: 'Stock not found.' });
-
-    const holding = await Portfolio.findOne({ user: req.user._id, stock: stockId });
-    if (!holding || holding.quantity < quantity)
-      return res.status(400).json({ success: false, message: 'Insufficient shares to sell.' });
-
-    const total = stock.price * quantity;
-    const user = await User.findById(req.user._id);
-
-    // Credit balance
-    user.balance += total;
-    await user.save();
-
-    // Create transaction
-    await Transaction.create({ user: user._id, stock: stockId, type: 'sell', quantity, price: stock.price, total });
-
-    // Update portfolio
-    holding.quantity -= quantity;
-    if (holding.quantity === 0) {
-      await holding.deleteOne();
-    } else {
-      await holding.save();
-    }
-
-    res.json({ success: true, message: `Sold ${quantity} share(s) of ${stock.symbol}.`, balance: user.balance });
+    res.status(201).json(
+      new ApiResponse(201, 'Stock sold successfully', {
+        transaction: result.transaction,
+        profitLoss: result.profitLoss,
+        newBalance: result.newBalance,
+      })
+    );
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
 // GET /api/transactions/history
-const getHistory = async (req, res) => {
+const getHistory = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 15;
-    const skip = (page - 1) * limit;
+    const { page = 1, limit = 20, type } = req.query;
 
-    const transactions = await Transaction.find({ user: req.user._id })
+    const filter = { user: req.user._id };
+    if (type) filter.type = type.toUpperCase();
+
+    const transactions = await Transaction.find(filter)
       .populate('stock', 'symbol name')
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
 
-    const total = await Transaction.countDocuments({ user: req.user._id });
-    const pages = Math.ceil(total / limit);
+    const total = await Transaction.countDocuments(filter);
 
-    res.json({ 
-      success: true, 
-      data: {
-        transactions, 
-        pagination: { page, limit, total, pages }
-      }
-    });
+    res.status(200).json(
+      new ApiResponse(200, 'Transaction history retrieved', {
+        transactions,
+        pagination: {
+          page: Number(page),
+          limit: Number(limit),
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      })
+    );
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-module.exports = { buyStock, sellStock, getHistory };
+module.exports = { buy, sell, getHistory };

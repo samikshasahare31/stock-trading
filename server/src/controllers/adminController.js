@@ -31,7 +31,15 @@ const addStock = async (req, res) => {
     if (!symbol || !name || !price)
       return res.status(400).json({ success: false, message: 'symbol, name, and price are required.' });
 
-    const stock = await Stock.create({ symbol, name, price, change, changePercent, sector });
+    const stock = await Stock.create({ 
+      symbol, 
+      name, 
+      price, 
+      currentPrice: price,  // Set currentPrice to price initially
+      change: change || 0, 
+      changePercent: changePercent || 0, 
+      sector: sector || 'General' 
+    });
     res.status(201).json({ success: true, stock });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
