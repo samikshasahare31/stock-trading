@@ -143,7 +143,7 @@ const TransactionHistoryPage = () => {
                         {tx.quantity}
                       </td>
                       <td className="px-5 py-4 text-sm text-gray-700 dark:text-gray-300 text-right whitespace-nowrap">
-                        {formatCurrency(tx.price)}
+                        {formatCurrency(tx.pricePerShare)}
                       </td>
                       <td className="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white text-right whitespace-nowrap">
                         {formatCurrency(tx.totalAmount)}

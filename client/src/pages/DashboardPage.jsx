@@ -188,7 +188,7 @@ const DashboardPage = () => {
                       {tx.quantity}
                     </td>
                     <td className="py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">
-                      {formatCurrency(tx.price)}
+                      {formatCurrency(tx.pricePerShare)}
                     </td>
                     <td className="py-3 text-right font-semibold text-gray-900 dark:text-white">
                       {formatCurrency(tx.totalAmount)}
