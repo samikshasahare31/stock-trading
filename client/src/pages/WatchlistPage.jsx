@@ -70,10 +70,11 @@ const WatchlistPage = () => {
       {stocks.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {stocks.map((stock) => {
-            const change = stock.currentPrice - stock.previousClose;
-            const changePercent = stock.previousClose
-              ? ((change / stock.previousClose) * 100)
-              : 0;
+            // ensure numeric values (server should supply currentPrice/price)
+            const price = stock.currentPrice ?? stock.price ?? 0;
+            const prevClose = stock.previousClose ?? price;
+            const change = price - prevClose;
+            const changePercent = prevClose ? ((change / prevClose) * 100) : 0;
             const isPositive = change >= 0;
 
             return (
@@ -100,7 +101,7 @@ const WatchlistPage = () => {
 
                 <div className="mb-3">
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {formatCurrency(stock.currentPrice || stock.price)}
+                    {formatCurrency(price)}
                   </p>
                 </div>
 
@@ -123,13 +124,17 @@ const WatchlistPage = () => {
                   </p>
                 )}
 
-                <Link
-                  to={`/stocks/${stock.symbol}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
-                >
-                  <FiEye size={14} />
-                  View Details
-                </Link>
+                {stock.symbol ? (
+                  <Link
+                    to={`/stocks/${stock.symbol}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+                  >
+                    <FiEye size={14} />
+                    View Details
+                  </Link>
+                ) : (
+                  <span className="text-sm text-gray-400">No symbol</span>
+                )}
               </div>
             );
           })}

@@ -4,10 +4,23 @@ const Watchlist = require('../models/Watchlist');
 const getWatchlist = async (req, res) => {
   try {
     let watchlist = await Watchlist.findOne({ user: req.user._id })
-      .populate('stocks', 'symbol name price change changePercent');
+      .populate('stocks', 'symbol name price currentPrice change changePercent');
+
+      console.log("watchlist",watchlist)
 
     if (!watchlist) {
       watchlist = { stocks: [] };
+    } else if (watchlist.stocks && watchlist.stocks.length) {
+      // convert to plain objects and ensure numeric price/currentPrice
+      watchlist.stocks = watchlist.stocks
+        // .map((s) => {
+        //   const obj = s.toObject ? s.toObject() : s;
+        //   obj.currentPrice = obj.currentPrice ?? obj.price ?? 0;
+        //   obj.price = obj.price ?? obj.currentPrice;
+        //   return obj;
+        // })
+        // // remove any entry that somehow has no symbol
+        // .filter((s) => s.symbol);
     }
 
     res.json({ success: true, watchlist });
