@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchStocks } from '../redux/slices/stockSlice';
+import { searchStocks } from '../redux/slices/stockSlice';
 import { formatCurrency } from '../utils/formatCurrency';
 import Loader from '../components/common/Loader';
 import {
@@ -30,7 +31,7 @@ const ITEMS_PER_PAGE = 20;
 
 const StockListPage = () => {
   const dispatch = useDispatch();
-  const { list: stocks, loading, pagination } = useSelector((state) => state.stocks);
+  const { list: stocks, searchResults, loading, pagination } = useSelector((state) => state.stocks);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState('All Sectors');
@@ -40,24 +41,21 @@ const StockListPage = () => {
     dispatch(fetchStocks());
   }, [dispatch]);
 
-  const filteredStocks = useMemo(() => {
-    let result = stocks;
-
+  useEffect(() => {
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (stock) =>
-          stock.symbol.toLowerCase().includes(query) ||
-          stock.name.toLowerCase().includes(query)
-      );
+      dispatch(searchStocks(searchQuery));
     }
+  }, [dispatch, searchQuery]);
+
+  const filteredStocks = useMemo(() => {
+    let result = searchQuery.trim() ? searchResults : stocks;
 
     if (selectedSector !== 'All Sectors') {
       result = result.filter((stock) => stock.sector === selectedSector);
     }
 
     return result;
-  }, [stocks, searchQuery, selectedSector]);
+  }, [stocks, searchResults, searchQuery, selectedSector]);
 
   const totalPages = Math.ceil(filteredStocks.length / ITEMS_PER_PAGE);
   const paginatedStocks = useMemo(() => {
@@ -70,13 +68,13 @@ const StockListPage = () => {
   }, [searchQuery, selectedSector]);
 
   const getChangeValue = (stock) => {
-    const price = stock.currentPrice || 0;
+    const price = stock.currentPrice || stock.price || 0;
     const prev = stock.previousClose || 0;
     return price - prev;
   };
 
   const getChangePercent = (stock) => {
-    const price = stock.currentPrice || 0;
+    const price = stock.currentPrice || stock.price || 0;
     const prev = stock.previousClose || 0;
     if (prev === 0) return 0;
     return ((price - prev) / prev) * 100;
@@ -169,7 +167,7 @@ const StockListPage = () => {
                           {stock.name}
                         </td>
                         <td className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-white">
-                          {formatCurrency(stock.currentPrice)}
+                          {formatCurrency(stock.currentPrice || stock.price)}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <span
@@ -236,7 +234,7 @@ const StockListPage = () => {
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-bold text-gray-900 dark:text-white">
-                      {formatCurrency(stock.currentPrice)}
+                      {formatCurrency(stock.currentPrice || stock.price)}
                     </span>
                     <span
                       className={`inline-flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-success-600' : 'text-danger-600'

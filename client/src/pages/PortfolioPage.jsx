@@ -238,7 +238,7 @@ const PortfolioPage = () => {
                 </thead>
                 <tbody className="divide-y dark:divide-gray-700">
                   {holdings.map((h) => {
-                    const currentPrice = h.stock?.currentPrice || h.currentPrice || 0;
+                    const currentPrice = h.stock?.currentPrice || h.stock?.price || 0;
                     const avgPrice = h.averageBuyPrice || 0;
                     const qty = h.quantity || 0;
                     const currentValue = currentPrice * qty;

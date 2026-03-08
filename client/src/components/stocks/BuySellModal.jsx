@@ -13,7 +13,10 @@ const BuySellModal = ({ stock, holding, onClose, onSuccess }) => {
   const { user } = useSelector((state) => state.auth);
   const { tradeLoading } = useSelector((state) => state.transactions);
 
-  const totalAmount = stock.currentPrice * quantity;
+  if (!stock || !stock._id) return null;
+
+  const price = stock.currentPrice || stock.price || 0;
+  const totalAmount = price * quantity;
   const canAfford = user.virtualBalance >= totalAmount;
   const canSell = holding && holding.quantity >= quantity;
 
@@ -86,7 +89,7 @@ const BuySellModal = ({ stock, holding, onClose, onSuccess }) => {
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Price per share</span>
-              <span className="dark:text-gray-300">{formatCurrency(stock.currentPrice)}</span>
+              <span className="dark:text-gray-300">{formatCurrency(price)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Quantity</span>

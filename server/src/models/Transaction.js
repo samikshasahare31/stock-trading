@@ -14,7 +14,7 @@ const transactionSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['buy', 'sell'],
+      enum: ['BUY', 'SELL'],
       required: true,
     },
     quantity: {
@@ -22,15 +22,24 @@ const transactionSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
-    price: {
+    pricePerShare: {
       type: Number,
       required: true,
       min: 0,
     },
-    total: {
+    totalAmount: {
       type: Number,
       required: true,
       min: 0,
+    },
+    balanceAfter: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    profitLoss: {
+      type: Number,
+      default: null, // Only for SELL transactions
     },
   },
   { timestamps: true }

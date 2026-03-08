@@ -105,7 +105,7 @@ const StockDetailPage = () => {
 
           <div className="text-left sm:text-right">
             <p className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">
-              {formatCurrency(stock.currentPrice)}
+              {formatCurrency(stock.currentPrice || stock.price)}
             </p>
             <div
               className={`inline-flex items-center gap-1.5 mt-1 text-sm font-semibold ${
@@ -249,7 +249,7 @@ const StockDetailPage = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 dark:text-gray-400">Current Value</span>
                   <span className="font-semibold text-gray-900 dark:text-white">
-                    {formatCurrency(stock.currentPrice * holding.quantity)}
+                    {formatCurrency((stock.currentPrice || stock.price) * holding.quantity)}
                   </span>
                 </div>
                 <hr className="dark:border-gray-700" />

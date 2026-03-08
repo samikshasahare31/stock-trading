@@ -17,7 +17,12 @@ const portfolioSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-    avgBuyPrice: {
+    averageBuyPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    totalInvested: {
       type: Number,
       required: true,
       min: 0,
