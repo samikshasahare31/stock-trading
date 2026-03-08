@@ -4,7 +4,7 @@ SB Stocks is a Full Stack Stock Trading Web Application built using the MERN Sta
 It allows users to track stocks, buy and sell stocks, and manage their portfolio through an interactive dashboard.
 
 🔗 Live Demo:
-https://samiksha-sb-stocks.netlify.app/dashboard
+https://samiksha-sb-stocks.netlify.app
 
 🚀 Features
 
