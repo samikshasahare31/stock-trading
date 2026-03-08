@@ -75,7 +75,6 @@ stock-trading
 └── README.md
 ⚙️ Installation
 1️⃣ Clone Repository
-git clone https://github.com/your-username/stock-trading.git
 2️⃣ Install Dependencies
 
 Client
