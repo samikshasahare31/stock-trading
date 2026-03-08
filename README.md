@@ -114,7 +114,7 @@ Mobile app version
 
 👩‍💻 Author
 
-# Samiksha Sahare  - Fromtend
+# Samiksha Sahare  - Frontend
 # Shabarish Sujith - Backend
 # Ronak Jaiswar    - Documentation
 # Sakshi Badhe     - Documentation
