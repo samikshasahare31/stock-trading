@@ -114,7 +114,9 @@ Mobile app version
 
 👩‍💻 Author
 
-Samiksha Sahare
-Shabarish Sujith
+# Samiksha Sahare  - Fromtend
+# Shabarish Sujith - Backend
+# Ronak Jaiswar    - Documentation
+# Sakshi Badhe     - Documentation
 
 Full Stack MERN Developer
