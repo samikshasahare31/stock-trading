@@ -35,13 +35,18 @@ const StockDetailPage = () => {
   }, [stock, holdings]);
 
   useEffect(() => {
-    dispatch(fetchStockDetail(symbol));
-    dispatch(fetchPortfolio());
+    if (symbol) {
+      dispatch(fetchStockDetail(symbol));
+      dispatch(fetchPortfolio());
+    } else {
+      // guard: if somehow we navigated here without a symbol, go back
+      navigate('/stocks', { replace: true });
+    }
 
     return () => {
       dispatch(clearSelectedStock());
     };
-  }, [dispatch, symbol]);
+  }, [dispatch, symbol, navigate]);
 
   const handleAddToWatchlist = async () => {
     if (!stock) return;
